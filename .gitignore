@@ -8,3 +8,4 @@ yolov4.cfg
 yolov4-tiny.cfg
 yolov4-tiny.weights
 todo.md
+/__pycache__
