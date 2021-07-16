@@ -37,7 +37,7 @@ def home():
 
         # ? check if valid image ---    
         if image.filename == "" or "." not in image.filename:
-            message = "Invalid filename"
+            message = "Invalid file"
             return redirect(url_for('.home', message=message))
 
         if not valid_size(int(request.cookies.get("filesize"))): 
@@ -70,11 +70,10 @@ def home():
                 filter_without = return_list(filter_without)
                 print(filter_without)
 
-            
-            image_output, total, class_count = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
+            image_output, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
             print(image_output)
             # image_output = object_detection(path)
-        return render_template('index.html', file=filename, output=image_output, total=total, class_count=class_count)
+        return render_template('index.html', file=filename, output=image_output, total=total, class_count=class_count, distances=distances, instance_names=instance_names)
 
     return render_template('index.html', file=False, output=False, message=message)
 

@@ -66,9 +66,9 @@
 
           <div class="filters">
             <div class="custom-file">
-                <input oninput="filesize(this);" type="file" id="image-input" name="image" accept="image/jpg, image/jpeg, image/png"/>
+                <input oninput="filesize(this);" type="file" id="image-input" name="image" accept="image/jpg, image/jpeg, image/png">
                 <label id="filename" class="custom-file-label text-left" for="image-input">
-                    Choose file
+                      Choose File
                 </label>
             </div>     
 
@@ -177,31 +177,32 @@
                 <br/>
 
                 <!-- Object Distance -->
+                {% if distances %}
                 <h4 class="text-left">Object Distance</h4>
                 <div>
-                  <table class="table table-bordered table-hover" style="width: 100%;">
+                  <table class="table table-bordered table-hover">
                     <thead class="thead-light">
                       <tr>
-                        <th>Object Distance Matrix</th>
-                        <th>cat</th>
-                        <th>dog</th>
+                        <td> --- </td>
+                        {% for instance_name in instance_names %}
+                          <td> {{ instance_name }}</td>
+                        {% endfor %}
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>cat</td>
-                        <td>-</td>
-                        <td>2.08m</td>
-                      </tr>
-                      <tr>
-                        <td>dog</td>
-                        <td>1.35m</td>
-                        <td>-</td>
-                      </tr>
+                      {% for row in distances %}
+                        <tr>
+                          <!-- object name too -->
+                          <td> {{instance_names[loop.index0]}}</td>
+                          {% for col in row %}
+                            <td> {{col}} pixels </td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
                     </tbody>
                   </table>
                 </div>
-
+                {% endif %}
               </div>
             <div class="btn-group">
                 <a class="btn btn-dark" href="/download/{{output}}" target="_blank">
