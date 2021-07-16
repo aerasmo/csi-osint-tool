@@ -6,18 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/styles.css"/>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
-
+    <link rel="icon" href="/static/icons/icon.png">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <title>Online Crime Scene OSINT tool</title>
   </head>
   <body>
-    <div class="alert alert-success" role="alert">
+    <!-- if error message -->
+    {% if message %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      <h4 class="alert-heading"> Error! </h4>
+      {{message}}
+    </div>  
+    {% endif %}
+
+    <!-- if success -->
+    {% if output %}
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
       <h4 class="alert-heading">Sucess!</h4>
       Image processing complete
     </div>
 
+
+    {% endif %}
     <div class="main">
       <h2 class="display-5">
         Open-source Image Analysis Tool for Object Identification and Distance
@@ -45,7 +59,7 @@
       <!-- loop -->
       <!-- collapse -->
       <div>
-        <h3>UPLOAD IMAGE HERE</h3>
+        <h3> Upload Image Here</h3>
         <br />
 
         <form action="/" method="POST" enctype="multipart/form-data">
@@ -62,25 +76,23 @@
               <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-sm">Filter Only</span>
               </div>
-              <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="cat"/>
+              <input type="text" class="form-control" name="filter-only" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="cat"/>
             </div>
 
             <div class="input-group input-group-sm">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="inputGroup-sizing-sm">Filter Without</span>
                 </div>
-                <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="dog"/>
+                <input type="text" class="form-control" name="filter-without" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="dog"/>
             </div>
 
           </div>
 
           <!-- Features -->
           <div>
-            <input type="checkbox" name="show-distance" id="show-distance" />
+            <input type="checkbox" name="show-distance" id="show-distance"/>
             <label class="mr-3" for="show-distance">Show Distance</label>
 
-            <input type="checkbox" name="show-count" id="show-count" />
-            <label for="show-count">Show Object Count</label>
           </div>
 
           <div class="mt-2 d-inline-block">
@@ -98,12 +110,19 @@
         Uploaded image 
         Processed image -->
 
-        <h3>Uploaded Image:</h3>
+        <div class="image-area">
+        {% if output %}
+          <h3 id="process-image-text"> Processed Image/s</h3>
+          <img id="output" alt="">
+
+        {% else %}
+          <h3 id="uploaded-image-text"> No Image</h3>
+          <img id="output" alt="" src="/static/icons/default_photo.png" class="default">
+        {% endif %}
         <!-- Placeholder Image Here -->
         <!-- <img src="https://placekitten.com/640/360"> -->
         
-        <div class="image-area">
-          <img id="output" alt="">
+        <!-- upload area -->
         </div> 
 
 
@@ -130,6 +149,7 @@
                 <hr><h3>Image Information:</h3><br />
 
                 <!-- Object Count -->
+                {%if total > 0 %}
                 <h4 class="text-left">Object Count</h4>
                 <div>
                   <table class="table table-bordered table-hover" style="width: 100%;">
@@ -140,18 +160,20 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>cat</td>
-                        <td>2</td>
-                      </tr>
-                      <tr>
-                        <td>dog</td>
-                        <td>1</td>
+                      {% for class, count in class_count.items() %}
+                          <tr>
+                            <td>{{class}}</td>
+                            <td>{{count}}</td>
+                          </tr>
+                      {% endfor %}
+                      <tr class="table-total">
+                        <td class="font-weight-bold">TOTAL</td>
+                        <td class="font-weight-bold">{{total}}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-
+                {% endif %}
                 <br/>
 
                 <!-- Object Distance -->
@@ -205,7 +227,25 @@
       {% endif %}
 
       </main>
-      
+    
+      <br><hr><br>
+      <div class="footer-basic">
+        <footer class="footer-list">
+            <ul class="list-inline">
+              <li class="list-inline-item"><a href="https://github.com/ptrckstuns" target="_blank">Patrick Castro</a></li>
+              <li class="list-inline-item"><a href="https://github.com/jyybril" target="_blank">Angelo Erasmo</a></li>
+              <li class="list-inline-item"><a href="https://github.com/julililicious" target="_blank">Julius Nocon</a></li>
+              <li class="list-inline-item"><a href="https://github.com/screo08" target="_blank">Jhon Bayquen</a></li>
+            </ul>
+            <div class="bg-light py-4">
+              <div class="container text-center">
+                <p class="text-muted mb-0 py-2">© 2021 Big Data. All Rights Reserved.</p>
+              </div>
+            </div>
+        </footer>
+      </div>
+
+
       
     {% block script %}
         <script src="/static/js/main.js"> </script>

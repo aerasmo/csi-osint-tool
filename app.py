@@ -1,9 +1,9 @@
 from flask import Flask, request, render_template, redirect, send_file
+from flask import url_for
 from werkzeug.utils import secure_filename
-import numpy as np
-import cv2 as cv
 import os
-from core import valid_ext, valid_size, object_detect
+import json
+from core import object_detect
 
 app = Flask(__name__)
 app.config["UPLOADS_PATH"] = './static/uploads'
@@ -11,46 +11,75 @@ app.config["OUTPUT_PATH"] = './static/output'
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = frozenset({"png", "jpg", "jpeg"})
 app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 0.5 * 1024 * 1024
 
+def valid_ext(filename):
+    ext = filename.rsplit(".", 1)[1]
+    if ext.lower() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return True
+    else:
+        return False
+
+def valid_size(size: int) -> bool:
+    if size > app.config["ALLOWED_MAX_IMAGE_FILESIZE"]:
+        return False
+    return True
+
+def return_list(filter_string):
+    return [s.lower().strip() for s in filter_string.split(',')]
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if request.method == 'POST' and 'image' in request.files: 
-        # ? user uploaded an image
+    message = False
+    if request.args:
+        message = request.args['message']
+    if request.method == 'POST' and 'image' in request.files: # ? user uploaded an image
+        # get image
         image = request.files["image"] 
 
-        # ? check if valid image ---
-    
-        if not valid_size(int(request.cookies.get("filesize"))): 
-            print("File Exceeded maximum size")
-            return redirect(request.url)
-
+        # ? check if valid image ---    
         if image.filename == "" or "." not in image.filename:
-            print("Invalid filename")
-            return redirect(request.url)
+            message = "Invalid filename"
+            return redirect(url_for('.home', message=message))
+
+        if not valid_size(int(request.cookies.get("filesize"))): 
+            message = "File Exceeded maximum size"
+            return redirect(url_for('.home', message=message))
 
         if not valid_ext(image.filename):
-            print("Invalid extension upload png, jpg, gif")
-            return redirect(request.url)
+            message = f'Invalid extension upload: {", ".join(list(app.config["ALLOWED_IMAGE_EXTENSIONS"]))} only'
+            return redirect(url_for('.home', message=message))
             
-
         # ? process if valid file --- 
         else:
             filename = secure_filename(image.filename) # ! make filename secure
             ext = filename.rsplit(".", 1)[1]
 
-
             path = os.path.join(app.config["UPLOADS_PATH"], filename) 
             image.save(path) # /uploads
 
-            image_output = object_detect(path, ext)
+            # get filters
+            filter_only = []
+            filter_without = [] 
+
+            # TODO implement a vulnerability checker 
+            # TODO check character and , only
+            if request.form['filter-only']:
+                filter_only = request.form['filter-only']
+                filter_only = return_list(filter_only)
+            if request.form['filter-without']:
+                filter_without = request.form['filter-without']
+                filter_without = return_list(filter_without)
+                print(filter_without)
+
+            
+            image_output, total, class_count = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
             print(image_output)
             # image_output = object_detection(path)
-        # return "Should be returning an IMAGE | VALID IMAGE | with boxes" 
-        return render_template('index.html', file=filename, output=image_output)
+        return render_template('index.html', file=filename, output=image_output, total=total, class_count=class_count)
 
-    return render_template('index.html', file=False)
+    return render_template('index.html', file=False, output=False, message=message)
 
 # visit locahost:5000/download/{filename}
-@app.route('/download/<path:filename>', methods=['GET', 'POST'])
+@app.route('/download/<path:path>', methods=['GET', 'POST'])
 def download(path):
     # return send_from_directory(directory=uploads, filename=filename)
     return send_file(path, as_attachment=True)

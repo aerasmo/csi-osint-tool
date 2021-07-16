@@ -2,7 +2,7 @@
   text-align: center;
 }
 .main {
-  margin: 2rem 3rem;
+  margin: 2rem 20rem;
 }
 
 th {
@@ -27,7 +27,11 @@ th {
   margin-top: 1rem;
   margin-bottom: 2rem;
 }
-
+.default {
+  margin-top: 0;
+  width: 20rem;
+  height: 20rem;
+}
 .image-area-collapse img {
   width: auto;
   /* max-height: 50%; */
@@ -51,4 +55,15 @@ th {
 }
 .btn-group .btn {
   margin: 1rem;
+}
+.footer-list a {
+  text-decoration: none;
+  color: black;
+}
+
+.footer-list a:hover {
+  text-decoration: none;
+}
+.table-total {
+  background-color: #E9ECEF;
 }
