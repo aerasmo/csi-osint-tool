@@ -24,7 +24,7 @@ model = cv.dnn_DetectionModel(net)
 model.setInputParams(size=(416, 416), scale=1/255, swapRB=True)
 
 
-def object_detect(path, ext, filter_only=[], filter_without=[]):
+def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=False):
     class_names = coco_names[:]
     class_ids = list(range(len(class_names)))
     
@@ -38,6 +38,7 @@ def object_detect(path, ext, filter_only=[], filter_without=[]):
         class_ids = list(filter(lambda i: class_names[i] not in filter_without, range(len(class_names))))
 
     img = cv.imread(path)
+    for_crop = img.copy()
     (H, W) = img.shape[:2]
     results = []
     # classes, scores,
@@ -50,6 +51,12 @@ def object_detect(path, ext, filter_only=[], filter_without=[]):
     coords = []
     centroids = []
     instance_names = []
+    cropped_images = []
+
+    # create directory for the objects output 
+    random_name = str(uuid.uuid4().hex) 
+    output_path = os.path.join(app.config["OUTPUT_PATH"], random_name)
+    os.mkdir(output_path)
     class_counts = defaultdict(lambda: 0)
     for (class_id, score, box) in zip(classes, scores, boxes):
         if class_id[0] not in class_ids:
@@ -76,6 +83,13 @@ def object_detect(path, ext, filter_only=[], filter_without=[]):
         centroids.append(centroid)
 
         cv.rectangle(img, box, color, 3) # for box
+
+        # cropping image
+        
+        cropped_path = os.path.join(output_path, instance_name + f".{ext}")
+        cropped = for_crop[y:y+h, x:x+w]
+        cv.imwrite(cropped_path, cropped)
+
         # res = cv.putText(img, label, (box[0], box[1]-10), cv.FONT_HERSHEY_COMPLEX, 0.5, color, 2)
 
         # set text
@@ -101,9 +115,9 @@ def object_detect(path, ext, filter_only=[], filter_without=[]):
     print(f"class counts: {class_counts}")
     print(f"total: {i}")
 
-    filename = str(uuid.uuid4().hex) + "." + ext
-    path = os.path.join(app.config["OUTPUT_PATH"], filename)
+    filename = f"output.{ext}"
+    path = os.path.join(output_path, filename)
     cv.imwrite(path, img)
 
     # return dictionary_count, total, path, distance
-    return path, i, class_counts, distances, instance_names
+    return random_name, filename, i, class_counts, distances, instance_names

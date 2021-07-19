@@ -70,18 +70,57 @@ def home():
                 filter_without = return_list(filter_without)
                 print(filter_without)
 
-            image_output, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
-            print(image_output)
+            output_path, output_name, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
+            print(output_name)
             # image_output = object_detection(path)
-        return render_template('index.html', file=filename, output=image_output, total=total, class_count=class_count, distances=distances, instance_names=instance_names)
+        return render_template('index.html', file=filename, output=output_name, output_path=output_path, total=total, class_count=class_count, distances=distances, instance_names=instance_names)
 
     return render_template('index.html', file=False, output=False, message=message)
 
 # visit locahost:5000/download/{filename}
-@app.route('/download/<path:path>', methods=['GET', 'POST'])
-def download(path):
+@app.route('/download/<path:foldername>', methods=['GET'])
+def download(foldername):
+
+    path = os.path.join(app.config["OUTPUT_PATH"], foldername) 
+    path = os.path.join(path, "output.jpg")
     # return send_from_directory(directory=uploads, filename=filename)
     return send_file(path, as_attachment=True)
+
+import zipfile
+import io
+import pathlib
+
+
+@app.route('/download/zip/<path:foldername>', methods=['GET'])
+def download_zip(foldername):
+    owd = os.getcwd()
+
+    os.chdir(os.path.join(app.config["OUTPUT_PATH"]))
+    data = io.BytesIO()
+   
+    with zipfile.ZipFile(data, mode='w') as z:
+        for dirname, subdirs, files in os.walk(foldername):
+            # if dirname in 'static'
+            print(dirname)
+            print(subdirs)
+            if dirname not in ['static', 'output']:
+                print(dirname)
+                z.write(dirname)
+            for filename in files:
+                print(os.path.join(dirname, filename))
+                z.write(os.path.join(dirname, filename))
+        z.close()
+
+    data.seek(0)
+
+    os.chdir(owd)
+    return send_file(
+        data,
+        mimetype='application/zip',
+        as_attachment=True,
+        attachment_filename=f'{foldername}.zip'
+    )
+
 # @app.route('/download')
 # def downloadFile ():
 #     #For windows you need to use drive name [ex: F:/Example.pdf]

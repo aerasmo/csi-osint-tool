@@ -142,7 +142,7 @@
               <div class="card-body">
                 <!-- Image View -->
                 <div class="image-area-collapse">
-                    <img src="{{output}}" alt="">
+                    <img src="/static/output/{{output_path}}/{{output}}" alt="">
                 </div>
           
                 <!-- Information -->
@@ -205,11 +205,11 @@
                 {% endif %}
               </div>
             <div class="btn-group">
-                <a class="btn btn-dark" href="/download/{{output}}" target="_blank">
+                <a class="btn btn-dark" href="/download/{{output_path}}" target="_blank">
                     Download Image
                   </a>
 
-                <a class="btn btn-dark" href="#">
+                <a class="btn btn-dark" href="/download/zip/{{output_path}}" target="_blank">
                   Download Objects as ZIP
               </a>
               <!-- if file -->
