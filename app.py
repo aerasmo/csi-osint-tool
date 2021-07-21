@@ -1,15 +1,15 @@
-from flask import Flask, request, render_template, redirect, send_file
-from flask import url_for
+from flask import Flask, request, render_template, redirect, send_file, url_for
 from werkzeug.utils import secure_filename
 import os
-import json
+import zipfile
+import io
 from core import object_detect
 
 app = Flask(__name__)
 app.config["UPLOADS_PATH"] = './static/uploads'
 app.config["OUTPUT_PATH"] = './static/output'
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = frozenset({"png", "jpg", "jpeg"})
-app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 0.5 * 1024 * 1024
+app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 1 * 1024 * 1024
 
 def valid_ext(filename):
     ext = filename.rsplit(".", 1)[1]
@@ -38,15 +38,15 @@ def home():
         # ? check if valid image ---    
         if image.filename == "" or "." not in image.filename:
             message = "Invalid file"
-            return redirect(url_for('.home', message=message))
+            return render_template('index.html', file=False, output=False, message=message)
 
         if not valid_size(int(request.cookies.get("filesize"))): 
             message = "File Exceeded maximum size"
-            return redirect(url_for('.home', message=message))
+            return render_template('index.html', file=False, output=False, message=message)
 
         if not valid_ext(image.filename):
             message = f'Invalid extension upload: {", ".join(list(app.config["ALLOWED_IMAGE_EXTENSIONS"]))} only'
-            return redirect(url_for('.home', message=message))
+            return render_template('index.html', file=False, output=False, message=message)
             
         # ? process if valid file --- 
         else:
@@ -59,36 +59,36 @@ def home():
             # get filters
             filter_only = []
             filter_without = [] 
-
+            filter_only_list = []
+            filter_without_list = []
+            show_distance = False
             # TODO implement a vulnerability checker 
             # TODO check character and , only
             if request.form['filter-only']:
                 filter_only = request.form['filter-only']
-                filter_only = return_list(filter_only)
+                filter_only_list = return_list(filter_only)
             if request.form['filter-without']:
                 filter_without = request.form['filter-without']
-                filter_without = return_list(filter_without)
+                filter_without_list = return_list(filter_without)
                 print(filter_without)
+            if request.form.get('show-distance') == 'true':
+                show_distance = True
 
-            output_path, output_name, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only, filter_without=filter_without)
+            output_path, output_name, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only_list, filter_without=filter_without_list, show_distance=show_distance)
+
+
             print(output_name)
             # image_output = object_detection(path)
-        return render_template('index.html', file=filename, output=output_name, output_path=output_path, total=total, class_count=class_count, distances=distances, instance_names=instance_names)
+        return render_template('index.html', file=filename, output=output_name, output_path=output_path, total=total, class_count=class_count, distances=distances, instance_names=instance_names, filter_only=filter_only, filter_without=filter_without)
 
     return render_template('index.html', file=False, output=False, message=message)
 
-# visit locahost:5000/download/{filename}
 @app.route('/download/<path:foldername>', methods=['GET'])
 def download(foldername):
 
     path = os.path.join(app.config["OUTPUT_PATH"], foldername) 
     path = os.path.join(path, "output.jpg")
-    # return send_from_directory(directory=uploads, filename=filename)
     return send_file(path, as_attachment=True)
-
-import zipfile
-import io
-import pathlib
 
 
 @app.route('/download/zip/<path:foldername>', methods=['GET'])
