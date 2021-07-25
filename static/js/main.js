@@ -42,11 +42,14 @@ if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
 }    
 
 function filesize(elem) {
-    var output = document.getElementById('output');
-    var fileName = document.getElementById('image-input');
+    console.log("changing")
+    var output = document.querySelector('.output');
+    var fileName = document.querySelector('#image-input');
+    var submit = document.querySelector('#submit-image');
     
 
-    output.classList.toggle('default')
+    output.classList.remove('default')
+    submit.disabled = false;
     let file = fileName.value.split(/(\\|\/)/g).pop()
     document.getElementById('uploaded-image-text').innerHTML = 'Uploaded Image'
     document.querySelector('.custom-file-label').innerHTML = file

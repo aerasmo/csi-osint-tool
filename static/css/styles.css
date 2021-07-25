@@ -31,6 +31,7 @@ th {
   margin-top: 0;
   width: 15rem;
   height: 15rem;
+  opacity: 0.6;
 }
 .image-area-collapse img {
   width: auto;

@@ -71,25 +71,28 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
     # create directory for the objects output 
     output_path = os.path.join(app.config["OUTPUT_PATH"], random_name)
     os.mkdir(output_path)
-    img_path = os.path.join(output_path, 'img')
 
     # detect objects from the model
     classes, scores, boxes = model.detect(img, CONF_THRESHHOLD, NMS_THRESHHOLD)
     colors = np.random.uniform(60, 125, size=(len(classes), 3))
+
+    img_path = os.path.join(output_path, 'objects')
+    os.mkdir(img_path)
 
     i = 0
     for (class_id, score, box) in zip(classes, scores, boxes):
         if class_id[0] not in class_ids: # if this filtered
             continue
 
-
         # class counts and instance names
         class_name = class_names[class_id[0]]
+
         class_counts[class_name] += 1
         instance_name = f"{class_name}{class_counts[class_name]}"
         instance_names.append(instance_name)
         accuracy = round(float(score*100), 2)
         label = f'{instance_name} {int(accuracy)}%'
+        
 
         # person: 98%
         # setting getting coords
@@ -111,7 +114,14 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
         cv.rectangle(img, box, color, 3) # for box
 
         # cropping image
-        cropped_path = os.path.join(output_path, instance_name + f".{ext}")
+        class_path = os.path.join(img_path, class_name)
+        try:
+            os.mkdir(class_path)
+        except FileExistsError:
+            pass
+
+        cropped_path = os.path.join(class_path, instance_name + f".{ext}")
+        print(cropped_path)
         cropped = for_crop[y:y+h, x:x+w]
         # crop_boxes.append((y, y+h, x, x+w))
         cv.imwrite(cropped_path, cropped)
@@ -119,7 +129,6 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
         # set text
         # print(f"{label} - {corners}")
         img = cv.putText(img, label, (box[0]+5, box[1]+20), font, 0.5, (0,0,0), 2)
-
         i += 1
 
     
@@ -156,7 +165,8 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
     writeCSV(output_path, count_csv, 'count')
     writeCSV(output_path, distance_csv, 'distance')
 
-    filename = f"output.{ext}"
+    # filename = f"output.{ext}"
+    filename = f"output.jpg"
     path = os.path.join(output_path, filename)
     cv.imwrite(path, img)
 

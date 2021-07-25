@@ -62,8 +62,7 @@ def home():
             filter_only_list = []
             filter_without_list = []
             show_distance = False
-            # TODO implement a vulnerability checker 
-            # TODO check character and , only
+
             if request.form['filter-only']:
                 filter_only = request.form['filter-only']
                 filter_only_list = return_list(filter_only)
@@ -83,31 +82,28 @@ def home():
 
     return render_template('index.html', file=False, output=False, message=message)
 
-@app.route('/download/<path:foldername>', methods=['GET'])
+
+@app.route('/download/<path:foldername>/output', methods=['GET'])
 def download(foldername):
-
-    path = os.path.join(app.config["OUTPUT_PATH"], foldername) 
-    path = os.path.join(path, "output.jpg")
-    return send_file(path, as_attachment=True)
+    path = os.path.join(app.config["OUTPUT_PATH"], foldername, 'output.jpg') 
+    return send_file(path, as_attachment=True, attachment_filename=f'{foldername}.jpg')
 
 
-@app.route('/download/zip/<path:foldername>', methods=['GET'])
+@app.route('/download/<path:foldername>/data', methods=['GET'])
 def download_zip(foldername):
     owd = os.getcwd()
-
-    os.chdir(os.path.join(app.config["OUTPUT_PATH"]))
+    # change dir to pics 
+    # os.chdir(os.path.join(app.config["OUTPUT_PATH"], foldername))
+    walk_path = os.path.join(app.config["OUTPUT_PATH"])
+    os.chdir(walk_path)
+    # os.chdir(os.path.join(app.config["OUTPUT_PATH"], 'imgs'))
     data = io.BytesIO()
    
     with zipfile.ZipFile(data, mode='w') as z:
         for dirname, subdirs, files in os.walk(foldername):
             # if dirname in 'static'
-            print(dirname)
-            print(subdirs)
-            if dirname not in ['static', 'output']:
-                print(dirname)
-                z.write(dirname)
+            z.write(dirname)
             for filename in files:
-                print(os.path.join(dirname, filename))
                 z.write(os.path.join(dirname, filename))
         z.close()
 
@@ -120,6 +116,50 @@ def download_zip(foldername):
         as_attachment=True,
         attachment_filename=f'{foldername}.zip'
     )
+
+
+@app.route('/download/<path:foldername>/objects', methods=['GET'])
+def download_img_zip(foldername):
+    owd = os.getcwd()
+    # change dir to pics 
+    os.chdir(os.path.join(app.config["OUTPUT_PATH"], foldername))
+    # os.chdir(os.path.join(app.config["OUTPUT_PATH"], 'imgs'))
+    data = io.BytesIO()
+   
+    with zipfile.ZipFile(data, mode='w') as z:
+        for dirname, subdirs, files in os.walk('objects'):
+            # if dirname in 'static'
+            z.write(dirname)
+            for filename in files:
+                z.write(os.path.join(dirname, filename))
+        z.close()
+
+    data.seek(0)
+
+    os.chdir(owd)
+    return send_file(
+        data,
+        mimetype='application/zip',
+        as_attachment=True,
+        attachment_filename=f'{foldername}.zip'
+    )
+
+    
+@app.route('/download/<path:foldername>/csv/count', methods=['GET'])
+def download_count_csv(foldername):
+    path = os.path.join(app.config["OUTPUT_PATH"], foldername, 'csv', 'count.csv') 
+    return send_file(path, as_attachment=True)
+
+@app.route('/download/<path:foldername>/csv/distance', methods=['GET'])
+def download_distance_csv(foldername):
+    path = os.path.join(app.config["OUTPUT_PATH"], foldername, 'csv', 'distance.csv') 
+    return send_file(path, as_attachment=True)
+
+
+@app.route('/remove/<path:foldername>', methods=['GET'])
+def remove(foldername):
+    path = os.path.join(app.config["OUTPUT_PATH"], foldername, 'output.jpg') 
+    return send_file(path, as_attachment=True)
 
 # @app.route('/download')
 # def downloadFile ():
