@@ -43,11 +43,35 @@ def writeCSV(path, data, filename):
             csv_writer.writerow(row)
         # spamwriter.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
 
-def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=False, show_distance=False):
+def draw_text(img, text,
+          font=cv.FONT_HERSHEY_PLAIN,
+          pos=(0, 0),
+          font_scale=3,
+          font_thickness=2,
+          text_color=(255, 255, 255),
+          text_color_bg=(0, 0, 0)
+          ):
+
+    x, y = pos
+    text_size, _ = cv.getTextSize(text, font, font_scale, font_thickness)
+    text_w, text_h = text_size
+    cv.rectangle(img, pos, (x + text_w + 10, y + text_h + 5), text_color_bg, -1)
+    img = cv.putText(img, text, (x, y + text_h + font_scale - 1), font, font_scale, text_color, font_thickness)
+    return img
+
+
+def max_image_res(w, h, max_res):
+    max_ = max(w, h)
+    coeff = max_res / max_
+    w *= coeff
+    h *= coeff
+    return (round(w), round(h))
+
+
+def object_detect(path, ext, filter_only=[], filter_without=[], show_distance=False, write_file=True):
     class_names = coco_names[:]
     class_ids = list(range(len(class_names)))
     
-    # TODO background for font
     # filters
     if filter_only:
         print(f"filtering only: {filter_only}")
@@ -57,7 +81,11 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
         class_ids = list(filter(lambda i: class_names[i] not in filter_without, range(len(class_names))))
 
     img = cv.imread(path) # orig image
+    height, width = img.shape[:2]
+    img = cv.resize(img, max_image_res(width, height, 1280), interpolation = cv.INTER_CUBIC)
+
     for_crop = img.copy() # dup for cropping
+
 
     count_csv = [['class', 'count']]
     distance_csv = [['object1_name', 'object1_position', 'object2_name' , 'object2_position', 'distance']]
@@ -68,16 +96,17 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
     class_counts = defaultdict(lambda: 0)
 
     random_name = str(uuid.uuid4().hex) # folder_dir
-    # create directory for the objects output 
-    output_path = os.path.join(app.config["OUTPUT_PATH"], random_name)
-    os.mkdir(output_path)
+        # create directory for the objects output 
+    if write_file:
+        output_path = os.path.join(app.config["OUTPUT_PATH"], random_name)
+        os.mkdir(output_path)
+        img_path = os.path.join(output_path, 'objects')
+        os.mkdir(img_path)
+
 
     # detect objects from the model
     classes, scores, boxes = model.detect(img, CONF_THRESHHOLD, NMS_THRESHHOLD)
-    colors = np.random.uniform(60, 125, size=(len(classes), 3))
-
-    img_path = os.path.join(output_path, 'objects')
-    os.mkdir(img_path)
+    colors = np.random.uniform(60, 150, size=(len(classes), 3))
 
     i = 0
     for (class_id, score, box) in zip(classes, scores, boxes):
@@ -90,7 +119,8 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
         class_counts[class_name] += 1
         instance_name = f"{class_name}{class_counts[class_name]}"
         instance_names.append(instance_name)
-        accuracy = round(float(score*100), 2)
+        accuracy = float(score*100)
+        # label = f'{class_name} {int(accuracy)}%'
         label = f'{instance_name} {int(accuracy)}%'
         
 
@@ -107,28 +137,29 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
         # print("centroid", centroid)
         coords.append(corners)
         centroids.append(centroid)
-        object_dict[instance_name] = {'class': class_name, 'corner': corners, 'centroid': centroid}
+        object_dict[instance_name] = {'class': class_name, 'corner': corners, 'centroid': centroid, 'accuracy': accuracy}
 
         # set rectangle 
         color = colors[i]
-        cv.rectangle(img, box, color, 3) # for box
+        cv.rectangle(img, box, color, thickness=4) # for box
 
-        # cropping image
-        class_path = os.path.join(img_path, class_name)
-        try:
-            os.mkdir(class_path)
-        except FileExistsError:
-            pass
+        if write_file:
+            # cropping image
+            class_path = os.path.join(img_path, class_name)
+            try:
+                os.mkdir(class_path)
+            except FileExistsError:
+                pass
 
-        cropped_path = os.path.join(class_path, instance_name + f".{ext}")
-        print(cropped_path)
-        cropped = for_crop[y:y+h, x:x+w]
-        # crop_boxes.append((y, y+h, x, x+w))
-        cv.imwrite(cropped_path, cropped)
+            cropped_path = os.path.join(class_path, instance_name + f".{ext}")
+            print(cropped_path)
+            cropped = for_crop[y:y+h, x:x+w]
+            cv.imwrite(cropped_path, cropped)
 
         # set text
         # print(f"{label} - {corners}")
-        img = cv.putText(img, label, (box[0]+5, box[1]+20), font, 0.5, (0,0,0), 2)
+        img = draw_text(img, label, pos=(box[0]+5, box[1]+5), text_color_bg=color)
+        # img = cv.putText(img, label, (box[0]+5, box[1]+20), font, 0.5, (0,0,0), 2)
         i += 1
 
     
@@ -150,7 +181,7 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
                 cv.circle(img, centroid_a, 5, (0, 0, 255), 10) # create circle at middle
                 cv.circle(img, centroid_b, 5, (0, 0, 255), 10) # create circle at middle
                 cv.line(img, centroid_a, centroid_b,(255,0,0),3)
-                img = cv.putText(img, str(distance), (distance_x, distance_y), font, 0.5, (255,255,255), 2)
+                img = cv.putText(img, str(distance), (distance_x, distance_y), font, 1, (255,255,255), 2)
         # distance table 
         distances = list(np.around( dist.cdist(centroids, centroids, metric="euclidean"), decimals=2 ))
         # print(distances)
@@ -159,16 +190,19 @@ def object_detect(path, ext, filter_only=[], filter_without=[], crop_objects=Fal
 
 
     # append classes counts to csv
-    for class_count in class_counts:
-        count_csv.append([class_count, class_counts[class_count]])
-    count_csv.append(['total', i])
-    writeCSV(output_path, count_csv, 'count')
-    writeCSV(output_path, distance_csv, 'distance')
+    filename = ""
+    if write_file:
+        # write csv
+        for class_count in class_counts:
+            count_csv.append([class_count, class_counts[class_count]])
+        count_csv.append(['total', i])
+        writeCSV(output_path, count_csv, 'count')
+        writeCSV(output_path, distance_csv, 'distance')
 
-    # filename = f"output.{ext}"
-    filename = f"output.jpg"
-    path = os.path.join(output_path, filename)
-    cv.imwrite(path, img)
+        # write final output
+        filename = f"output.jpg"
+        path = os.path.join(output_path, filename)
+        cv.imwrite(path, img)
 
     # return dictionary_count, total, path, distance
-    return random_name, filename, i, class_counts, distances, instance_names
+    return random_name, filename, i, class_counts, distances, instance_names, object_dict

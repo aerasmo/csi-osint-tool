@@ -73,7 +73,7 @@ def home():
             if request.form.get('show-distance') == 'true':
                 show_distance = True
 
-            output_path, output_name, total, class_count, distances, instance_names = object_detect(path, ext, filter_only=filter_only_list, filter_without=filter_without_list, show_distance=show_distance)
+            output_path, output_name, total, class_count, distances, instance_names, acc = object_detect(path, ext, filter_only=filter_only_list, filter_without=filter_without_list, show_distance=show_distance)
 
 
             print(output_name)

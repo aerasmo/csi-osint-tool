@@ -11,3 +11,6 @@ __pycache__
 todo.md
 /static/uploads/*
 /static/output/*
+test-data
+test.py
+test-results
