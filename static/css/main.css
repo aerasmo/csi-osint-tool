@@ -1,0 +1,269 @@
+body {
+  /* background: url('https://tenor.com/br4D2.gif') no-repeat fixed center;     */
+  background: url("bgtest.jpg") no-repeat fixed center;
+  background-size: cover;
+  color: white;
+}
+
+.alert {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  padding: 1rem 0 0.4rem 0;
+  opacity: 0.925;
+}
+
+.alert p {
+  color: #181825;
+}
+
+.main {
+  /* background: #141d2b; */
+  background: #181825;
+  border-radius: 1.25rem;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  /* box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px; */
+  opacity: 0.99;
+  margin: 2rem 14%;
+  margin-top: 3rem;
+  padding: 0 2rem;
+}
+
+.main img {
+  max-height: 30rem;
+  max-width: 40rem;
+  margin-top: 1rem;
+  margin-bottom: 0rem;
+}
+
+header {
+  padding: 4rem 1rem 2rem 1rem;
+}
+
+header #title {
+  font-size: 2rem;
+  letter-spacing: 1.10px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+header .description {
+  font-size: 1rem;
+  line-height: 2;
+}
+
+header .description b {
+  color: #F3B801;
+}
+
+.forms {
+  padding-top: 2rem;
+}
+
+.forms .description {
+  margin-top: 1rem;
+}
+
+.forms .description b {
+  color: #F3B801;
+}
+
+.forms .upload-form {
+  margin-bottom: 2rem;
+}
+
+.forms .upload-form #image-input {
+  display: none;
+}
+
+.forms .upload-form label {
+  border: 2px solid gray;
+  color: #666;
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  box-shadow: 0px 3px 0px 0px gray;
+}
+
+.forms .upload-form label:active {
+  transform: translateY(2px);
+  box-shadow: 0px 2px 0px 0px gray;
+}
+
+.forms .filters {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.forms .filters .text-filter {
+  margin: 1rem 0.3rem;
+  width: 20%;
+}
+
+.forms .filters .text-filter p {
+  font-size: 1.15rem;
+}
+
+.forms .distance-filter {
+  font-size: 1.15rem;
+}
+
+.forms .image-area img {
+  margin-top: 0.25rem;
+}
+
+.forms .image-area .default {
+  width: 15rem;
+  height: auto;
+  filter: invert(99%) sepia(2%) saturate(1%) hue-rotate(31deg) brightness(116%) contrast(92%);
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.forms #submit-image {
+  margin-top: 1rem;
+  padding: 10px 3.5rem;
+  border-radius: 8px;
+  font-size: 1.10rem;
+  font-weight: bold;
+  color: #e6e6e6;
+  background-color: #0b74e4;
+  box-shadow: 0px 5px 0px 0px #0d55a2;
+}
+
+.forms #submit-image:active {
+  transform: translateY(2px);
+  box-shadow: 0px 4px 0px 0px #115baa;
+}
+
+main {
+  margin-top: 5rem;
+}
+
+main h4 {
+  margin-bottom: 2rem;
+}
+
+main img {
+  max-height: 30rem;
+  max-width: 30rem;
+  margin-top: 1rem;
+  margin-bottom: 0rem;
+}
+
+main .card {
+  background: #1b1b2c;
+  padding-bottom: 2rem;
+}
+
+main .card-header {
+  background: #F3B801;
+  opacity: 0.95;
+  border-radius: 10px !important;
+  padding: 1rem 0;
+}
+
+main .card-header h5 {
+  font-size: 2rem;
+  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.1);
+}
+
+main .card-header a, main .card-header a:active, main .card-header a:link {
+  color: #13121d;
+  text-decoration: none;
+}
+
+main .btn-group {
+  margin: 1.5rem auto;
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 37.5rem;
+  z-index: 3;
+}
+
+main .btn-group .btn {
+  margin: 1rem;
+  padding: 10px 3rem;
+  border-radius: 10px !important;
+}
+
+main .btn-primary {
+  background-color: #106cce;
+}
+
+main .btn {
+  padding: 10px 3rem;
+  border-radius: 10px !important;
+  margin-top: 1rem;
+}
+
+main table, main tr, main th {
+  border-collapse: collapse !important;
+}
+
+main .table-head {
+  background-color: #272741 !important;
+}
+
+.zoom-image-container {
+  z-index: 4;
+  position: absolute;
+  top: 23%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.zoom-image img {
+  z-index: 5;
+  cursor: none;
+  border-radius: 5px;
+  box-shadow: 0 18px 5px -15px rgba(0, 0, 0, 0.5);
+}
+
+.hover-image {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  transform: translate(-50%, -20%);
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+hr {
+  background: #e5e5e5;
+  margin: 1rem;
+}
+
+.footer-list a {
+  text-decoration: none;
+  color: white;
+}
+
+.footer-list ul {
+  margin: 0;
+  padding: 0;
+}
+
+.footer-list a:hover {
+  text-decoration: none;
+  color: #0b74e4;
+}
+
+@media (max-width: 1000px) {
+  .main {
+    margin: 2rem 5%;
+    padding: 0 1rem;
+  }
+  .filters {
+    flex-wrap: wrap;
+  }
+}
+/*# sourceMappingURL=main.css.map */

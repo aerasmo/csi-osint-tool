@@ -11,6 +11,9 @@ app.config["OUTPUT_PATH"] = './static/output'
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = frozenset({"png", "jpg", "jpeg"})
 app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 1 * 1024 * 1024
 
+HTML_TEMPLATE = 'home.html'
+
+
 def valid_ext(filename):
     ext = filename.rsplit(".", 1)[1]
     if ext.lower() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
@@ -38,15 +41,15 @@ def home():
         # ? check if valid image ---    
         if image.filename == "" or "." not in image.filename:
             message = "Invalid file"
-            return render_template('index.html', file=False, output=False, message=message)
+            return render_template(HTML_TEMPLATE, file=False, output=False, message=message)
 
         if not valid_size(int(request.cookies.get("filesize"))): 
             message = "File Exceeded maximum size"
-            return render_template('index.html', file=False, output=False, message=message)
+            return render_template(HTML_TEMPLATE, file=False, output=False, message=message)
 
         if not valid_ext(image.filename):
             message = f'Invalid extension upload: {", ".join(list(app.config["ALLOWED_IMAGE_EXTENSIONS"]))} only'
-            return render_template('index.html', file=False, output=False, message=message)
+            return render_template(HTML_TEMPLATE, file=False, output=False, message=message)
             
         # ? process if valid file --- 
         else:
@@ -78,9 +81,9 @@ def home():
 
             print(output_name)
             # image_output = object_detection(path)
-        return render_template('index.html', file=filename, output=output_name, output_path=output_path, total=total, class_count=class_count, distances=distances, instance_names=instance_names, filter_only=filter_only, filter_without=filter_without)
+        return render_template(HTML_TEMPLATE, file=filename, output=output_name, output_path=output_path, total=total, class_count=class_count, distances=distances, instance_names=instance_names, filter_only=filter_only, filter_without=filter_without)
 
-    return render_template('index.html', file=False, output=False, message=message)
+    return render_template(HTML_TEMPLATE, file=False, output=False, message=message)
 
 
 @app.route('/download/<path:foldername>/output', methods=['GET'])
