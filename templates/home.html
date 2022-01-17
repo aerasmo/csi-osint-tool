@@ -67,11 +67,7 @@
         </header>
       <hr />
 
-      <!-- -->
-
-
-      <!-- loop -->
-      <!-- collapse -->
+      <!-- upload -->
       <div class="forms">
         <h3> Upload Image Here</h3>
         <div class="description">
@@ -83,9 +79,8 @@
           </p>
         </div>
 
-        
         <br />
-
+        
         <form action="/" method="POST" enctype="multipart/form-data">
           <div class="upload-form">
             <input oninput="filesize(this);" type="file" id="image-input" name="image" accept="image/jpg, image/jpeg, image/png">
@@ -107,11 +102,6 @@
                     <!-- <h5 id="uploaded-image-text"></h5> -->
                 {% endif %}
 
-            <!-- Placeholder Image Here -->
-            <!-- <img src="https://placekitten.com/640/360"> -->
-            
-            <!-- upload area -->
-            <!-- class="d-none" -->
             </div> 
             <div id="inputs" 
                 {% if not file %}
@@ -121,9 +111,7 @@
                 <div class="filters">
                     <div class="text-filter">
                         <p> Filter Only </p>
-                      <!-- <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroup-sizing-sm">Filter Only</span>
-                      </div> -->
+
                       {%if filter_only %}
                         <input type="text" onkeypress="return /[a-zA-Z, ]/i.test(event.key)" class="form-control" name="filter-only" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{filter_only}}"/>
                       {% else %}
@@ -134,9 +122,6 @@
                     <div class="text-filter">
                         <p> Filter Without </p>
 
-                        <!-- <div class="input-group-prepend">
-                          <span class="input-group-text" id="inputGroup-sizing-sm">Filter Without</span>
-                        </div> -->
                         {%if filter_without %}
                         <input type="text" onkeypress="return /[a-zA-Z, ]/i.test(event.key)" class="form-control" name="filter-without" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="{{filter_without}}"/>
                         {% else %}
@@ -152,34 +137,18 @@
                   </div>
             </div>
 
-          <!-- Features -->
-
-
           <div class="mt-2 d-inline-block">
             <input id="submit-image" class="btn btn-primary" type="submit" value="Submit" disabled/>
-            <!-- <button id="submit-image"type="submit"> <span> Submit </span></button> -->
 
           </div>
           
         </form>
       </div>
 
-      <!-- <hr /> -->
-      <!-- --- -->
 
       {% if file %}
       <main id="content">
-      <!-- <div class="image-area"> -->
-        <!-- {% if output %} -->
-          <!-- <h3 id="uploaded-image-text"> Processed Image</h3> -->
-          <!-- <img class="output" alt=""> -->
 
-        <!-- {% endif %} -->
-        <!-- Placeholder Image Here -->
-        <!-- <img src="https://placekitten.com/640/360"> -->
-        
-        <!-- upload area -->
-        <!-- </div>  -->
       <div id="accordion" role="tablist">
           <div class="card">
             <div class="card-header" role="tab" id="headingOne">
@@ -218,8 +187,6 @@
                   </a>
                 </div>
                 {% endif %}
-
-                <!-- Information -->
 
                 <hr>
                 <br>
@@ -297,12 +264,8 @@
                 </a>
                 {% endif %}
               </div>
-
-
-          </div>
-
             </div>
-
+          </div>
       </div>
       {% endif %}
       </main>
@@ -323,9 +286,6 @@
             </div>
         </footer>
       </div>
-
-
-      
-
+     
   </body>
 </html>
