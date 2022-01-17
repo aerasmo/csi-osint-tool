@@ -11,7 +11,7 @@ app.config["OUTPUT_PATH"] = './static/output'
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = frozenset({"png", "jpg", "jpeg"})
 app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 1 * 1024 * 1024
 
-HTML_TEMPLATE = 'home.html'
+HTML_TEMPLATE = 'home.jinja'
 
 
 def valid_ext(filename):
