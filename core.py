@@ -21,13 +21,12 @@ with open('coco.names', 'r') as f:
     coco_names = [cname.strip() for cname in f.readlines()]
 
 # model config
-net = cv.dnn.readNet('yolov4.weights', 'yolov4.cfg')
+# net = cv.dnn.readNet('yolov4.weights', 'yolov4.cfg')
+net = cv.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
 net.setPreferableBackend(cv.dnn.DNN_BACKEND_CUDA)
 net.setPreferableTarget(cv.dnn.DNN_TARGET_CUDA)
-
 model = cv.dnn_DetectionModel(net)
 model.setInputParams(size=(416, 416), scale=1/255, swapRB=True)
-
 font = cv.FONT_HERSHEY_COMPLEX
 
 def writeCSV(path, data, filename):
@@ -110,11 +109,11 @@ def object_detect(path, ext, filter_only=[], filter_without=[], show_distance=Fa
 
     i = 0
     for (class_id, score, box) in zip(classes, scores, boxes):
-        if class_id[0] not in class_ids: # if this filtered
+        if class_id not in class_ids: # if this filtered
             continue
 
         # class counts and instance names
-        class_name = class_names[class_id[0]]
+        class_name = class_names[class_id]
 
         class_counts[class_name] += 1
         instance_name = f"{class_name}{class_counts[class_name]}"

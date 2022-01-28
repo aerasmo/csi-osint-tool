@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, send_file, url_for
+from flask import Flask, request, render_template, redirect, send_file, url_for, make_response
 from werkzeug.utils import secure_filename
 import os
 import zipfile
@@ -43,6 +43,7 @@ def home():
             message = "Invalid file"
             return render_template(HTML_TEMPLATE, file=False, output=False, message=message)
 
+        # check if cookies exist 
         if not valid_size(int(request.cookies.get("filesize"))): 
             message = "File Exceeded maximum size"
             return render_template(HTML_TEMPLATE, file=False, output=False, message=message)

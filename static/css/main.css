@@ -5,7 +5,7 @@ body {
   color: white;
 }
 
-.alert {
+/* .alert {
   position: absolute;
   top: 0;
   left: 0;
@@ -13,8 +13,19 @@ body {
   z-index: 10;
   padding: 1rem 0 0.4rem 0;
   opacity: 0.925;
+} */
+.dismiss {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
-
+.dismiss span {
+  font-size: 1.25rem;
+}
 .alert p {
   color: #181825;
 }
@@ -183,7 +194,6 @@ main .btn-group {
   margin: 1.5rem auto;
   display: inline-flex;
   justify-content: center;
-  margin-top: 37.5rem;
   z-index: 3;
 }
 
@@ -205,36 +215,11 @@ main .btn {
 
 main table, main tr, main th {
   border-collapse: collapse !important;
+  color: white;
 }
 
 main .table-head {
   background-color: #272741 !important;
-}
-
-.zoom-image-container {
-  z-index: 4;
-  position: absolute;
-  top: 23%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.zoom-image img {
-  z-index: 5;
-  cursor: none;
-  border-radius: 5px;
-  box-shadow: 0 18px 5px -15px rgba(0, 0, 0, 0.5);
-}
-
-.hover-image {
-  position: fixed;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  transform: translate(-50%, -20%);
-  pointer-events: none;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  z-index: 20;
 }
 
 hr {
