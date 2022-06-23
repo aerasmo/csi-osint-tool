@@ -13,7 +13,6 @@ app.config["ALLOWED_MAX_IMAGE_FILESIZE"] = 1 * 1024 * 1024
 
 HTML_TEMPLATE = 'home.jinja'
 
-
 def valid_ext(filename):
     ext = filename.rsplit(".", 1)[1]
     if ext.lower() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
@@ -165,12 +164,11 @@ def remove(foldername):
     path = os.path.join(app.config["OUTPUT_PATH"], foldername, 'output.jpg') 
     return send_file(path, as_attachment=True)
 
-# @app.route('/download')
-# def downloadFile ():
-#     #For windows you need to use drive name [ex: F:/Example.pdf]
-#     path = "/Examples.pdf"
-#     return send_file(path, as_attachment=True)
-
-
+def create_static_dirs():
+    if not os.path.exists(app.config["UPLOADS_PATH"]):
+        os.mkdir(app.config["UPLOADS_PATH"])
+    if not os.path.exists(app.config["OUTPUT_PATH"]):
+        os.mkdir(app.config["OUTPUT_PATH"])
 if __name__ == '__main__':
+    create_static_dirs()
     app.run(debug=True)
